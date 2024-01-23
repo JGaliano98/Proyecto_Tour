@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ProvinciaRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Turbo\Attribute\Broadcast;
 
@@ -18,6 +20,14 @@ class Provincia
     #[ORM\Column(length: 255)]
     private ?string $nombre = null;
 
+    #[ORM\OneToMany(mappedBy: 'id_provincia', targetEntity: Localidad::class, orphanRemoval: true)]
+    private Collection $localidades;
+
+    public function __construct()
+    {
+        $this->localidades = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -31,6 +41,36 @@ class Provincia
     public function setNombre(string $nombre): static
     {
         $this->nombre = $nombre;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Localidad>
+     */
+    public function getLocalidades(): Collection
+    {
+        return $this->localidades;
+    }
+
+    public function addLocalidade(Localidad $localidade): static
+    {
+        if (!$this->localidades->contains($localidade)) {
+            $this->localidades->add($localidade);
+            $localidade->setIdProvincia($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLocalidade(Localidad $localidade): static
+    {
+        if ($this->localidades->removeElement($localidade)) {
+            // set the owning side to null (unless already changed)
+            if ($localidade->getIdProvincia() === $this) {
+                $localidade->setIdProvincia(null);
+            }
+        }
 
         return $this;
     }

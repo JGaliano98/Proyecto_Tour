@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -38,6 +40,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private ?int $telefono = null;
+
+    #[ORM\OneToMany(mappedBy: 'id_usuario', targetEntity: Ruta::class, orphanRemoval: true)]
+    private Collection $rutas;
+
+    #[ORM\OneToMany(mappedBy: 'id_usuario', targetEntity: Tour::class, orphanRemoval: true)]
+    private Collection $tours;
+
+    #[ORM\OneToMany(mappedBy: 'id_usuario', targetEntity: Reserva::class, orphanRemoval: true)]
+    private Collection $reservas;
+
+    public function __construct()
+    {
+        $this->rutas = new ArrayCollection();
+        $this->tours = new ArrayCollection();
+        $this->reservas = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -153,6 +171,96 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setTelefono(int $telefono): static
     {
         $this->telefono = $telefono;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Ruta>
+     */
+    public function getRutas(): Collection
+    {
+        return $this->rutas;
+    }
+
+    public function addRuta(Ruta $ruta): static
+    {
+        if (!$this->rutas->contains($ruta)) {
+            $this->rutas->add($ruta);
+            $ruta->setIdUsuario($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRuta(Ruta $ruta): static
+    {
+        if ($this->rutas->removeElement($ruta)) {
+            // set the owning side to null (unless already changed)
+            if ($ruta->getIdUsuario() === $this) {
+                $ruta->setIdUsuario(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Tour>
+     */
+    public function getTours(): Collection
+    {
+        return $this->tours;
+    }
+
+    public function addTour(Tour $tour): static
+    {
+        if (!$this->tours->contains($tour)) {
+            $this->tours->add($tour);
+            $tour->setIdUsuario($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTour(Tour $tour): static
+    {
+        if ($this->tours->removeElement($tour)) {
+            // set the owning side to null (unless already changed)
+            if ($tour->getIdUsuario() === $this) {
+                $tour->setIdUsuario(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Reserva>
+     */
+    public function getReservas(): Collection
+    {
+        return $this->reservas;
+    }
+
+    public function addReserva(Reserva $reserva): static
+    {
+        if (!$this->reservas->contains($reserva)) {
+            $this->reservas->add($reserva);
+            $reserva->setIdUsuario($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReserva(Reserva $reserva): static
+    {
+        if ($this->reservas->removeElement($reserva)) {
+            // set the owning side to null (unless already changed)
+            if ($reserva->getIdUsuario() === $this) {
+                $reserva->setIdUsuario(null);
+            }
+        }
 
         return $this;
     }

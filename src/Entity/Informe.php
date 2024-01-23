@@ -23,6 +23,9 @@ class Informe
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $foto = null;
 
+    #[ORM\OneToOne(inversedBy: 'informe', cascade: ['persist', 'remove'])]
+    private ?Tour $id_tour = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -60,6 +63,18 @@ class Informe
     public function setFoto(?string $foto): static
     {
         $this->foto = $foto;
+
+        return $this;
+    }
+
+    public function getIdTour(): ?Tour
+    {
+        return $this->id_tour;
+    }
+
+    public function setIdTour(?Tour $id_tour): static
+    {
+        $this->id_tour = $id_tour;
 
         return $this;
     }
